@@ -9,6 +9,8 @@ def process_event(frame):
     ## vaidade event ##
     if (controler.command == 4):
         print(controler.evttype( ))
+    else:
+        print(controler.command)
 
     # return_event = validate_event(controler)
         # executa comando (event)
