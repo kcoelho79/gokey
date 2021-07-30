@@ -1,24 +1,17 @@
-import selectors
-import socket
+import socket, selectors
 import time
-import domain
-import libserver
+import libserver, libevents
+import controlers
 
+def process_event(frame):
+    print("PROCESS EVENT")
+    controler = controlers.get_controler(frame)
 
-sel = selectors.DefaultSelector()
-
-def acionamento(conn, evento):
-    if (evento == b'@5410EC5B7909@kafe@0001\x00'):
-        print("1 conexao - keep live")
-    else:
-        print("ACIONAMENTO: EVENTO")
-        print("EVENTO :",evento)
-        time.sleep(3)
-        comando = bytearray(b'\x00\r\x03\x01\x01\x00\x12')
-        resposta = conn.send(comando)  # Hope it won't block
-        print("RESPOSTA", resposta)
-    sel.unregister(conn)
-    conn.close()
+    # return_event = validate_event(controler)
+        # executa comando (event)
+    # send_event   
+    controler.whoiam()
+    # tipo de evento #controler.event_type()
 
 def accept(sock, mask):
     conn, addr = sock.accept()  # Should be ready
@@ -28,21 +21,17 @@ def accept(sock, mask):
     
 
 def read(conn, mask):
-    data = conn.recv(1000)  # Should be ready
-    if data:
-        print('echoing', repr(data), 'to', conn)
-        print("DATA", data)
-        d = domain.eval_input(data)
-        print("d",d)
-        conn.send(d)
-       # sel.modify(conn, selectors.EVENT_WRITE, data)
-       #conn.send(comando)  # Hope it won't block
+    frame = conn.recv(1024)  # Should be ready
+    if frame and libevents.validade_header(frame):
+        print('echoing', repr(frame), 'to', conn)
+        return_event = process_event(frame)
+        #conn.send(return_event)
     else:
         print('closing', conn)
         sel.unregister(conn)
         conn.close()
 
-def process_events(address):
+def process_request(address):
     sock = socket.socket()
     sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     sock.bind(address)
@@ -52,13 +41,14 @@ def process_events(address):
 
     while True:
         events = sel.select(timeout=15)
-        time.sleep(2)
+        time.sleep(1)
         for key, mask in events:
-            print("FUNCAO ",callback)
             callback = key.data
+            print("FUNCAO ",callback)
             callback(key.fileobj, mask)
                 
 
 if __name__ == '__main__':
     address = libserver.parse_command_line("star server")
-    process_events(address)
+    sel = selectors.DefaultSelector()
+    process_request(address)
