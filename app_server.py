@@ -6,6 +6,9 @@ import controlers
 def process_event(frame):
     print("PROCESS EVENT")
     controler = controlers.get_controler(frame)
+    ## vaidade event ##
+    if (controler.command == 4):
+        print(controler.evttype( ))
 
     # return_event = validate_event(controler)
         # executa comando (event)
@@ -18,7 +21,6 @@ def accept(sock, mask):
     print('accepted', conn, 'from', addr)
     conn.setblocking(False)
     sel.register(conn, selectors.EVENT_READ, read)
-    
 
 def read(conn, mask):
     frame = conn.recv(1024)  # Should be ready
