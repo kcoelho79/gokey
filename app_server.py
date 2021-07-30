@@ -2,6 +2,8 @@ import selectors
 import socket
 import time
 import domain
+import libserver
+
 
 sel = selectors.DefaultSelector()
 
@@ -40,22 +42,23 @@ def read(conn, mask):
         sel.unregister(conn)
         conn.close()
 
-sock = socket.socket()
-sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-sock.bind(('10.238.0.47', 1060))
-sock.listen(3) 
-sock.setblocking(False)
-sel.register(sock, selectors.EVENT_READ, accept)
+def process_events(address):
+    sock = socket.socket()
+    sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    sock.bind(address)
+    sock.listen(3) 
+    sock.setblocking(False)
+    sel.register(sock, selectors.EVENT_READ, accept)
 
-while True:
-    events = sel.select(timeout=15)
-   # print("RECEBIDO TIPO EVENTO", events[0])
-    time.sleep(2)
-    for key, mask in events:
-        callback = key.data
-        print("FUNCAO ",callback)
-        if mask == 1:
+    while True:
+        events = sel.select(timeout=15)
+        time.sleep(2)
+        for key, mask in events:
+            print("FUNCAO ",callback)
+            callback = key.data
             callback(key.fileobj, mask)
-        elif mask == 2:
-            evento = key.data
-            acionamento(key.fileobj, evento)    
+                
+
+if __name__ == '__main__':
+    address = libserver.parse_command_line("star server")
+    process_events(address)
