@@ -1,22 +1,7 @@
 import socket, selectors
 import time
 import libserver, libevents
-import controlers
-
-def process_event(frame):
-    print("PROCESS EVENT")
-    controler = controlers.get_controler(frame)
-    ## vaidade event ##
-    if (controler.command == 4):
-        print(controler.evttype( ))
-    else:
-        print(controler.command)
-
-    # return_event = validate_event(controler)
-        # executa comando (event)
-    # send_event   
-    controler.whoiam()
-    # tipo de evento #controler.event_type()
+from event import process_event
 
 def accept(sock, mask):
     conn, addr = sock.accept()  # Should be ready
@@ -28,7 +13,7 @@ def read(conn, mask):
     frame = conn.recv(1024)  # Should be ready
     if frame and libevents.validade_header(frame):
         print('echoing', repr(frame), 'to', conn)
-        return_event = process_event(frame)
+        process_event(frame)
         #conn.send(return_event)
     else:
         print('closing', conn)
