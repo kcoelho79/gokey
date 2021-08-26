@@ -10,3 +10,5 @@ eventos (read, write) das conexões.
 
 fluxo request =>accept => read => process_event
 
+## Modulo Controler
+possui as configuracoes das controladoras para lidar com os eventos
