@@ -18,9 +18,3 @@ def process_event(frame):
 
     else:
         print("COMANDO ",controler.command)
-    # return_event = validate_event(controler)
-        # executa comando (event)
-    # send_event   
-    controler.whoiam()
-    # tipo de evento #controler.event_type()
-

@@ -19,22 +19,18 @@ class MG3000():
             "Acionamento pelo PC",
         ]
 
-        # self.tab_evtinfo = [
-
-        # ]
-
-        self.frame = frame
-        self.token = self.__gettoken__(frame)
-        self.command = commands.get(frame[6])
-        self.evtsize = frame[4]
+        self.frame    = frame
+        self.token    = self.__gettoken__(frame)
+        self.command  = commands.get(frame[6])
+        self.evtsize  = frame[4]
         self.keeplive = True if self.token else False
-        self.serial = convert.fmtByte_to_Str(frame[9:11 + 1], separador='')
+        self.serial   = convert.fmtByte_to_Str(frame[9:11 + 1], separador='')
+        self.receptor = self.iddevice()
 
 
     def __gettoken__(self, frame):
         if (frame[0] == 64 and frame[13] == 64):
             return str(frame).split("@") 
-
 
     def evttype(self):
         b1 = self.frame[8]
@@ -87,9 +83,26 @@ class MG3000():
             return 'evento já lido '
 
     def evtinfo(self):
-        valor_tipo = self.b1_high
-        valor_info = self.frame[23]
-        print("flag ==valor =>>>> :  ",valor_info)
-        return valor_info
+        evttype = self.b1_high
+        b16 = self.frame[23]
 
-    
+        nibleL = (b16 & 0x0F)
+        # ver documentacao sensores
+        # bit0 = receptor 1
+        # bit1 = receptor 2
+        # bit2 = receptor 3
+        # bit3 = receptor 4
+        i = self.receptor - 1
+        value = convert.onebit(b16, i)
+        print("bit  ==valor =>>>> :  ",value)
+        evttype = self.b1_high
+        if (evttype == 0):
+            if (b16 == 170):
+                info = "Fora de Horario"
+            else:
+                if (value == 0):
+                    info = "Sensor Aberto"
+                else:
+                    info = "Sensor Fechado" 
+        return info
+
