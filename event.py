@@ -1,20 +1,50 @@
 import controlers
+import bd
+import command
+import libbit
+import time
 
-def process_event(frame):
+def process_event(frame, conn, sel):
     print("PROCESS EVENT")
-    controler = controlers.discover(frame)
-    if (controler.keeplive):
+    device = controlers.discover(frame)
+    if (device.keeplive):
         print("Keep Alive")
-    elif (controler.command == "event"):
-        print("evento   :", controler.evttype())
-        print("serial   :", controler.serial)
-        print("data     :", controler.evtdate())
-        print("device   :", controler.device())
-        print("setor    :", controler.sector())
-        print("leitora  :", controler.iddevice())
-        print("Evento   :", controler.evtread())
-        print("Bateria  :", controler.battery())
-        print("info     :", controler.evtinfo())
+    elif (device.command == "event"):
+        print("evento   :", device.evttype())
+        print("serial   :", device.serial)
+        print("data     :", device.evtdate())
+        print("device   :", device.devicetype())
+        print("setor    :", device.sector())
+        print("device int:", device.device_type)
+        print("leitora  :", device.receptor())
+        print("Evento   :", device.evtread())
+        print("Bateria  :", device.battery())
+        print("info     :", device.evtinfo())
+        if (device.controler == "CONTROL2"):
+            print("Endereco :", device.deviceid() )
+
+        if (device.evttype() == "Dispositivo Acionado"):
+            if (device.serial in bd.AUTORIZADOS):
+                print("ACIONAMENTO AUTORIZADO")
+                COMANDO = device.acionamento()
+                print(COMANDO)
+                print(libbit.fmtByte_to_Str(COMANDO,' '))
+                conn.send(COMANDO)
+                # print("FECHADNO", conn)
+                # print("================")
+                # sel.unregister(conn)
+                # conn.close()
+                # time.sleep(5)
+                # print("xxxxxxxxxxxxxxxxx")
+                # print("COMANDADNDO A PORRA TODA DE NOVO")
+                # conn.send(COMANDO)
+
+            else:
+                print("ACIONAMENTO NAO AUTORIZADO")
 
     else:
-        print("COMANDO ",controler.command)
+        if (device.command):
+            print("COMANDO ",device.command)
+        else:
+            print("COMANDO  NAO CATALOGADO", frame[6])
+

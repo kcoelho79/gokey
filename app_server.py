@@ -2,6 +2,7 @@ import socket, selectors
 import time
 import libserver, libevents
 from event import process_event
+import libbit as convert
 
 def accept(sock, mask):
     conn, addr = sock.accept()  # Should be ready
@@ -13,7 +14,8 @@ def read(conn, mask):
     frame = conn.recv(1024)  # Should be ready
     if frame and libevents.validade_header(frame):
         print('echoing', repr(frame), 'to', conn)
-        process_event(frame)
+        print(convert.fmtByte_to_Str(frame,"/"))
+        process_event(frame, conn, sel)
         #conn.send(return_event)
     else:
         print('closing', conn)
