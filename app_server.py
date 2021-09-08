@@ -3,6 +3,7 @@ import time
 import libserver, libevents
 from event import process_event
 import libbit as convert
+import controlers
 
 def accept(sock, mask):
     conn, addr = sock.accept()  # Should be ready
@@ -15,8 +16,8 @@ def read(conn, mask):
     if frame and libevents.validade_header(frame):
         print('echoing', repr(frame), 'to', conn)
         print(convert.fmtByte_to_Str(frame,"/"))
-        process_event(frame, conn, sel)
-        #conn.send(return_event)
+        controler = controlers.discover(frame, conn)
+        controler.run_commmand()
     else:
         print('closing', conn)
         sel.unregister(conn)

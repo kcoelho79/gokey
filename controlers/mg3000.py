@@ -1,24 +1,20 @@
 import libbit as convert
 from datetime import datetime
-
+import libevents
+from controlers.frame_evt import FrameEvt
+import bd
 
 class MG3000():
-    def __init__(self, frame):
+    def __init__(self, frame, conn):
 
-        commands = {
-            4 : "event",
-        }
-
-        tab_device = [
-            0,
-            "RF",
-            2,
-            "CARTAO"
-        ]
-
+        self.frame = frame
+        self.conn = conn
         self.controler = "MG3000"
-        self.cod_acionamento = b'\x00\x0d'
-
+        commands = {
+            4 : self.__pc_event4,
+            33: self.__pc_event33,
+            46: self.__pc_evento_nao_cadastrado,
+        }
         self.tab_evttype = [
             "Dispositivo Acionado",
             "Passagem",
@@ -29,91 +25,73 @@ class MG3000():
             "Acionamento pelo PC",
         ]
 
-        self.frame    = frame
+        self.tab_device = [
+			0,
+			"RF",
+			2,
+			"CARTAO"
+		]
         self.token    = self.__gettoken__(frame)
         self.command  = commands.get(frame[6])
-        self.evtsize  = frame[4]
         self.keeplive = True if self.token else False
-        self.serial   = convert.fmtByte_to_Str(frame[9:11 + 1], separador='')
-        self.device_type = tab_device[self.devicetype()]
 
+    def run_commmand(self):
+        if (self.keeplive == False):
+            if (self.command):
+                comando = self.command
+                comando()
+            else:
+                print("COMANDO  NAO CATALOGADO", frame[6])
+        else:
+            print("KeepLive")
 
     def __gettoken__(self, frame):
         if (frame[0] == 64 and frame[13] == 64):
-            return str(frame).split("@") 
+            return str(frame).split("@")    
 
-    def evttype(self):
-        b1 = self.frame[8]
-        self.b1_high = (b1 & 0xF1) >> 4
-        return self.tab_evttype[self.b1_high]
+    def __print_event(self, event):
+        print("evento   :", self.tab_evttype[event.evttype])
+        print("serial   :", event.serial)
+        print("data     :", event.date)
+        print("device   :", self.tab_device[event.device])
+        print("setor    :", event.sector)
+        print("leitora  :", event.receptor)
+        print("info     :", event.info)  
+    
+    # PC COMANDOS EVENTOS
 
-    def evtdate(self):
-        hora =  convert.bcd2int(self.frame[12])
-        minuto = convert.bcd2int(self.frame[13])
-        segundo = convert.bcd2int(self.frame[14])
-        dia = convert.bcd2int(self.frame[15])
-        mes = convert.bcd2int(self.frame[16])
-        ano = convert.bcd2int(self.frame[17])
-        data = datetime(int(ano), int(mes), int(dia), int(hora), int(minuto), int(segundo))
-        return (datetime.strftime(data, "%d/%m/%y %H:%M:%S"))
+    def __pc_evento_nao_cadastrado(self):
+        print("Evento NAO CADASTRADO FUNCAO")
 
-    def devicetype(self):
-        b11 = self.frame[18]
-        nibbleH = (b11 >> 4)
-        if (nibbleH < 4):
-            return nibbleH
-        else:
-            return 0
+    def __pc_event4(self):
+        print("COMANDO EVENTO 4")
+        frameevento =  self.frame[8: 23 + 1]
+        self.__process_event(frameevento)
+    
+    def __pc_event33(self):
+        print("COMANDO EVENTO 33")
+        frameevento =  self.frame[7: 22 + 1]
+        self.__process_event(frameevento)
+    
+    def __process_event(self, frameevento):
+        event = FrameEvt(frameevento, self.controler)
+        if (event.evttype == 0): 
+            if (event.serial in bd.AUTORIZADOS):
+                resposta = self.conn.send(self.acionamento(event))
+                print("RESPOSTA ->",resposta)
+            else:
+                print("ENTRADA NAO AUTORIZADO")
+        self.__print_event(event)
 
-    def sector(self): #porta can
-        b11 = self.frame[18] 
-        nibleL = (b11 & 0x0F)
-        return nibleL + 1
+    
+    # PC COMANDOS EXECUTANDO
 
-    def battery(self):
-        b22 = self.frame[22]
-        battery = convert.onebit(b22, 7)
-        if battery == 0:
-            return 'bateria OK'
-        else:
-            return 'bateria fraca'
-
-    def receptor(self):
-        b22 = self.frame[22]
-        value = convert.bits2int(b22, 5, 4)  # bit2:1
-        return value + 1
-
-    def evtread(self):
-        b22 = self.frame[22]
-        if convert.onebit(b22, 6) == 0:
-            return 'Evento não lido'
-        else:
-            return 'evento já lido '
-
-    def evtinfo(self):
-        evttype = self.b1_high
-        b16 = self.frame[23]
-        nibleL = (b16 & 0x0F)
-        # ver documentacao sensores
-        # bit0 = receptor 1
-        # bit1 = receptor 2
-        # bit2 = receptor 3
-        # bit3 = receptor 4
-        i = (self.receptor()) - 1
-        value = convert.onebit(b16, i)
-        evttype = self.b1_high
-        info = "n/a"
-        if (evttype == 0):
-            if (b16 == 170):
-                info = "Fora de Horario"
-        return info
-
-    def acionamento(self):
-        #MG3000 commando/tipo_disp/num_disp/saida/evt
+    def acionamento(self, event):
+        #commando/tipo_disp/num_disp/saida/evt
         print("Comando Acionamento")
-        disp =  self.devicetype()
-        num_disp = self.sector() - 1
-        saida = self.receptor()
+        disp =  event.device
+        num_disp = event.sector - 1
+        saida = event.receptor
         geraevt = 1
         payload = bytearray()
         payload += b'\x00\x0d'
@@ -124,4 +102,3 @@ class MG3000():
         cs = convert.calcula_checksum(payload)
         payload.append(cs) 
         return(payload)
-

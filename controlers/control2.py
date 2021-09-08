@@ -40,7 +40,7 @@ class CONTROL2():
             'c',
             'd',
             'e',
-            'f'
+            'Não cadastrado'
         ]
 
         self.tab_evtinfo = [
