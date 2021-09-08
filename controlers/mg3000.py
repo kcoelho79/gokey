@@ -33,17 +33,17 @@ class MG3000():
 		]
         self.token    = self.__gettoken__(frame)
         self.command  = commands.get(frame[6])
-        self.keeplive = True if self.token else False
+
+    def __iskeeplive(self):
+        return print("==> KeepLive <==") if self.token else False
 
     def run_commmand(self):
-        if (self.keeplive == False):
+        if (self.__iskeeplive() == False):
             if (self.command):
                 comando = self.command
                 comando()
             else:
                 print("COMANDO  NAO CATALOGADO", frame[6])
-        else:
-            print("KeepLive")
 
     def __gettoken__(self, frame):
         if (frame[0] == 64 and frame[13] == 64):

@@ -1,7 +1,6 @@
 import socket, selectors
 import time
 import libserver, libevents
-from event import process_event
 import libbit as convert
 import controlers
 

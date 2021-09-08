@@ -1,7 +1,9 @@
 # My own custom
 
+bkps/
 todo
 notas
+tmp/
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
