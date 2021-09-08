@@ -8,12 +8,20 @@ def validade_header(frame):
 def get_serial(frame):
     return convert.fmtByte_to_Str(frame, separador='')
 
-def get_date(frame):
-    hora =  convert.bcd2int(frame[0])
-    minuto = convert.bcd2int(frame[1])
-    segundo = convert.bcd2int(frame[2])
-    dia = convert.bcd2int(frame[3])
-    mes = convert.bcd2int(frame[4])
-    ano = convert.bcd2int(frame[5])
+def get_date(frame, bcd=True):
+    if (bcd):
+        hora =  convert.bcd2int(frame[0])
+        minuto = convert.bcd2int(frame[1])
+        segundo = convert.bcd2int(frame[2])
+        dia = convert.bcd2int(frame[3])
+        mes = convert.bcd2int(frame[4])
+        ano = convert.bcd2int(frame[5])
+    else:
+        hora =  frame[0]
+        minuto = frame[1]
+        segundo = frame[2]
+        dia = frame[3]
+        mes = frame[4]
+        ano = frame[5]
     data = datetime(int(ano), int(mes), int(dia), int(hora), int(minuto), int(segundo))
     return (datetime.strftime(data, "%d/%m/%y %H:%M:%S"))

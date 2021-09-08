@@ -2,35 +2,20 @@ import libbit as convert
 from datetime import datetime
 import libevents
 from controlers.frame_evt import FrameEvt
+import controlers.mg3000conf as conf
 import bd
 
 class MG3000():
     def __init__(self, frame, conn):
 
-        self.frame = frame
-        self.conn = conn
-        self.controler = "MG3000"
         commands = {
             4 : self.__pc_event4,
             33: self.__pc_event33,
             46: self.__pc_evento_nao_cadastrado,
         }
-        self.tab_evttype = [
-            "Dispositivo Acionado",
-            "Passagem",
-            "Equipamento Ligado",
-            "Desperta Porteiro",
-            "Mudança de Programação",
-            "Acionamento pela Botoeira",
-            "Acionamento pelo PC",
-        ]
-
-        self.tab_device = [
-			0,
-			"RF",
-			2,
-			"CARTAO"
-		]
+        self.frame = frame
+        self.conn = conn
+        self.controler = "MG3000"
         self.token    = self.__gettoken__(frame)
         self.command  = commands.get(frame[6])
 
@@ -43,22 +28,23 @@ class MG3000():
                 comando = self.command
                 comando()
             else:
-                print("COMANDO  NAO CATALOGADO", frame[6])
+                print("COMANDO NAO CATALOGADO", frame[6])
 
     def __gettoken__(self, frame):
         if (frame[0] == 64 and frame[13] == 64):
             return str(frame).split("@")    
 
     def __print_event(self, event):
-        print("evento   :", self.tab_evttype[event.evttype])
+        print("====  MG3000   ====")
+        print("evento   :", conf.tab_evttype[event.evttype])
         print("serial   :", event.serial)
         print("data     :", event.date)
-        print("device   :", self.tab_device[event.device])
+        print("device   :", conf.tab_device[event.device])
         print("setor    :", event.sector)
         print("leitora  :", event.receptor)
         print("info     :", event.info)  
     
-    # PC COMANDOS EVENTOS
+# PC COMANDOS EVENTOS
 
     def __pc_evento_nao_cadastrado(self):
         print("Evento NAO CADASTRADO FUNCAO")
@@ -84,7 +70,7 @@ class MG3000():
         self.__print_event(event)
 
     
-    # PC COMANDOS EXECUTANDO
+# PC COMANDOS EXECUTANDO
 
     def acionamento(self, event):
         #commando/tipo_disp/num_disp/saida/evt
