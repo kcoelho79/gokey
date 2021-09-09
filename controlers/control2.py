@@ -51,6 +51,7 @@ class CONTROL2():
         frameevento = self.frame[9:24 + 1]
         self.__process_event(frameevento)
 
+    ## RULES
     def __process_event(self, frameevento):
         event = FrameEvt(frameevento, self.controler)
         if (event.evttype == 0): 
