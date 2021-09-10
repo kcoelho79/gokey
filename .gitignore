@@ -1,6 +1,26 @@
-# My own custom
+# tests and coverage
+*.pytest_cache
+.coverage
 
+# database & logs
+*.db
+*.sqlite3
+*.log
+
+# javascript
+package-lock.json
+
+staticfiles/*
+!staticfiles/.gitkeep 
+.vscode/symbols.json
+
+core/static/assets/node_modules
+core/static/assets/yarn.lock
+core/static/assets/.temp
+
+# My own custom
 bkps/
+venv/
 todo
 notas
 tmp/
