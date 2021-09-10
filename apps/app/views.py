@@ -1,14 +1,12 @@
 # -*- encoding: utf-8 -*-
-"""
-Copyright (c) 2019 - present AppSeed.us
-"""
-
 from django import template
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import loader
 from django.urls import reverse
-
+from django.shortcuts import render
+from django.views.generic.edit import CreateView
+from .models import Resident
 
 #@login_required(login_url="/login/")
 def index(request):
@@ -17,6 +15,14 @@ def index(request):
     html_template = loader.get_template('index.html')
     return HttpResponse(html_template.render(context, request))
 
+#@login_required(login_url="/login/")
+def ResidentCreate(request):
+    if request.method == 'POST':
+        form = request.POST
+        if form.is_valid():
+            return HttpResponse("SUCESSO")
+    else:
+        return render(request, 'app/resident_form.html')
 
 #@login_required(login_url="/login/")
 def pages(request):

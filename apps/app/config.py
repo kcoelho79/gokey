@@ -1,10 +1,6 @@
-# -*- encoding: utf-8 -*-
-"""
-Copyright (c) 2019 - present AppSeed.us
-"""
+# -*- encoding: utf-8 -*
 
 from django.apps import AppConfig
-
 
 class MyConfig(AppConfig):
     name = 'apps.app'
