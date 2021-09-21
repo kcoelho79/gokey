@@ -1,0 +1,25 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Lista Residentes Cadastrados {% endblock %} 
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+<ul>
+	{% for object in object_list %}
+	<li>{{ object.name }}</li>
+	<li>{{ object.serial }}</li>
+
+	<hr/>
+	<!-- If object_list is empty -->
+	{% empty %}
+	<li>No objects yet.</li>
+	{% endfor %}
+</ul>
+
+    
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}{% endblock javascripts %}

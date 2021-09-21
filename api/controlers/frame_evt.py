@@ -6,7 +6,7 @@ class FrameEvt():
 	def __init__(self, frame, controler):
 		if (controler == "MG3000"):
 			self.evttype 		= frame[0] & 0xF1 >> 4
-			self.serial 		= convert.fmtByte_to_Str(frame[1:3 + 1], separador='')
+			self.serial 		= '0000' + convert.fmtByte_to_Str(frame[1:3 + 1], separador='')
 			self.date 			= libevents.get_date(frame[4:9 + 1],bcd=True)
 			self.device 		= frame[10] >> 4
 			self.sector			= (frame[10] & 0x0F) + 1

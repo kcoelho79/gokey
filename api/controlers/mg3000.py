@@ -1,6 +1,7 @@
 import libbit as convert
 from datetime import datetime
 import libevents
+import librule
 from controlers.frame_evt import FrameEvt
 import controlers.mg3000conf as conf
 import bd
@@ -48,6 +49,12 @@ class MG3000():
 
     def __pc_evento_nao_cadastrado(self):
         print("Evento NAO CADASTRADO FUNCAO")
+        print("checando banco de dados")
+        serial = '0000' + convert.fmtByte_to_Str(self.frame[10:12+1])
+        if (librule.isresident(serial)):
+            print("TA NO BANCO")
+        else:
+            print("NAO ESTA NO BANCO")
 
     def __pc_event4(self):
         print("COMANDO EVENTO 4")
@@ -62,7 +69,8 @@ class MG3000():
     def __process_event(self, frameevento):
         event = FrameEvt(frameevento, self.controler)
         if (event.evttype == 0): 
-            if (event.serial in bd.AUTORIZADOS):
+            if (librule.isresident(event.serial)):
+           # if (event.serial in bd.AUTORIZADOS):
                 resposta = self.conn.send(self.acionamento(event))
                 print("RESPOSTA ->",resposta)
             else:

@@ -3,9 +3,15 @@ def serial_to_hex(serial):
     s1, s2 = serial.split('-')  # separa o prefixo 2 algarismo e o  sufixo 4 algarismo do serial
     s1 = int(s1).to_bytes(1, 'big')  # converte inteiro para byte
     s2 = int(s2).to_bytes(2, 'big')
-    #serial = b'\x00\x00\x00' + s1 + s2
     serial = b'\x00\x00' + s1 + s2
     return serial
+
+def serial_to_strhex(serial):
+    s1, s2 = serial.split('-')  # separa o prefixo 2 algarismo e o  sufixo 4 algarismo do serial
+    s1 = int(s1).to_bytes(1, 'big')  # converte inteiro para byte
+    s2 = int(s2).to_bytes(2, 'big')
+    serial = b'\x00\x00' + s1 + s2
+    return fmtByte_to_Str(serial)
 
 def get_address(payload):
     address = message[-6:]

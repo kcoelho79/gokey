@@ -2,7 +2,23 @@
 Controle de acesso dos dispositivos da marca LINEAR e NICE, utilizando a comunicação via IP por SOCKET.
 compativeis com os controladores MG3000, GuaritaIP e ControladoraII
 
-## app_server
+# estrutura de pastas
+gokey
+	frontend
+		apps (aplicativos)
+			app (fronend web)
+			authentication (autenticaçao usuario)
+		core (pasta core do Django setting/)
+	backend
+		api (modo server,)
+			controler (driver das controladoras)
+			lib* (bibliotecas desenvolvidas)
+
+
+## API (backend Python) 
+responsável pelo recebimento dos eventos das controladoras
+
+### app_server
 daemon que estabele conexões e recebe os eventos(frames) das controladoras,usando SOCKET, com o Selector que registra os eventos (read, write) das conexões.
 [select] (https://pymotw.com/2/select/)
 
@@ -13,14 +29,14 @@ daemon que estabele conexões e recebe os eventos(frames) das controladoras,usan
 =>run_command (que identifica qual e a controladora,
 deserializa o frame, identifica o tipo de evento, valida se é autorizado e executa)
 
-## Modulo Controler
+### Modulo Controler
 possui as configuracoes das controladoras para lidar com os eventos, cada modulo é um controlador
 
 controlers (biblioteca)
 	"nome_contoler.py" 		Classe que trata os eventos, e executa comandos
 	"nome_controlerconf.py" Tabelas com as configurações
 
-## Modulo frames
+### Modulo frames
 frame_evt.py = parse no evento, pegandos informaçoes como:
 	data, 
 	tipo evento = Dispositivo Acionado, Passagem, etc.
@@ -31,17 +47,17 @@ frame_evt.py = parse no evento, pegandos informaçoes como:
 
 essas informações: são usadas para tomada de decisões de negócio
 
-## objeto controler
+### objeto controler
 Ao criar(init) o objeto, no arquivo __init__.py identifica o tipo da controladora, MG3000, GuaritaIP, ControladoraII, pega o 7Byte, contem informação do tipo do PC_Comando, ver tabela de protocolo, e então chama a funcão que executará o comando
 
-## libevents, libbit, libserver
+### libevents, libbit, libserver
 Sao handler funções auxiliadores
 
-## Gokey
-### backend
-Essa versão OpenSource, é StateFull,o evento é lido e respondido no mesmo objeto em um único fluxo, isso é feito para trabalhar com links dinamicos, e as limitações de não conseguir identificar controladora usando TCP e link dinamicp em um ambiente cloud computing.
+Essa versão OpenSource, é StateFull,o evento é lido e respondido no mesmo objeto em um único fluxo, isso é feito para trabalhar com links dinamicos, e as limitações de não conseguir identificar controladora usando TCP e link dinamici em um ambiente cloud computing.
 
-### frontend
+
+## FrontEnd (Python Django)
+
 
 ## Diferenças e pecularidades Controladores
 

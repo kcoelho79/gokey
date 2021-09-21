@@ -4,8 +4,9 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import loader
 from django.urls import reverse
-from django.shortcuts import render
+from django.shortcuts import render 
 from django.views.generic.edit import CreateView
+from django.views.generic.list import ListView
 from .models import Resident
 
 #@login_required(login_url="/login/")
@@ -16,13 +17,12 @@ def index(request):
     return HttpResponse(html_template.render(context, request))
 
 #@login_required(login_url="/login/")
-def ResidentCreate(request):
-    if request.method == 'POST':
-        form = request.POST
-        if form.is_valid():
-            return HttpResponse("SUCESSO")
-    else:
-        return render(request, 'app/resident_form.html')
+class ResidentCreate(CreateView):
+    model = Resident
+    fields = ['name', 'serial']
+
+class ResidentList(ListView):
+    model = Resident
 
 #@login_required(login_url="/login/")
 def pages(request):
