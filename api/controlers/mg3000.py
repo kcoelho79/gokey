@@ -5,6 +5,7 @@ import librule
 from controlers.frame_evt import FrameEvt
 import controlers.mg3000conf as conf
 import bd
+from api.models import Events
 
 class MG3000():
     def __init__(self, frame, conn):
@@ -43,18 +44,33 @@ class MG3000():
         print("device   :", conf.tab_device[event.device])
         print("setor    :", event.sector)
         print("leitora  :", event.receptor)
-        print("info     :", event.info)  
+        print("info     :", event.info)
+        print("Acesso   :", event.access)
+        print("Resposta :", event.resposta)
+        self.__save_db(event)
+
+
+    def __save_db(self, event):
+        Events(
+            frame=self.frame,
+            controler = self.controler,
+            data = event.date,
+            serial = event.serial,
+            access = event.access,
+            receptor = event.receptor,
+            resident = "NULO",
+        ).save()
     
 # PC COMANDOS EVENTOS
 
     def __pc_evento_nao_cadastrado(self):
         print("Evento NAO CADASTRADO FUNCAO")
-        print("checando banco de dados")
+        print("CONSULTANDO banco de dados")
         serial = '0000' + convert.fmtByte_to_Str(self.frame[10:12+1])
         if (librule.isresident(serial)):
-            print("TA NO BANCO")
+            print("SERIAL CADASTRADO AUTORIZADO")
         else:
-            print("NAO ESTA NO BANCO")
+            print("SERIAL NAO AUTORIZADO")
 
     def __pc_event4(self):
         print("COMANDO EVENTO 4")
@@ -69,12 +85,14 @@ class MG3000():
     def __process_event(self, frameevento):
         event = FrameEvt(frameevento, self.controler)
         if (event.evttype == 0): 
-            if (librule.isresident(event.serial)):
-           # if (event.serial in bd.AUTORIZADOS):
-                resposta = self.conn.send(self.acionamento(event))
-                print("RESPOSTA ->",resposta)
+           # if (librule.isresident(event.serial)):
+            if (event.serial in bd.AUTORIZADOS):
+                event.resposta = self.conn.send(self.acionamento(event))
+                print("RESPOSTA ->", event.resposta)
+                event.access = 'Autorizado'
             else:
                 print("ENTRADA NAO AUTORIZADO")
+                event.access = 'Nao Autorizado'
         self.__print_event(event)
 
     
@@ -86,7 +104,7 @@ class MG3000():
         disp =  event.device
         num_disp = event.sector - 1
         saida = event.receptor
-        geraevt = 1
+        geraevt = 0
         payload = bytearray()
         payload += b'\x00\x0d'
         payload.append(disp)
@@ -96,3 +114,25 @@ class MG3000():
         cs = convert.calcula_checksum(payload)
         payload.append(cs) 
         return(payload)
+
+    def crud_device(self, op, serial, receptor):
+        #comando 67 0x00+0x43
+        #comando/opcao/frame_dev/cs
+        #opcao,serial,label,receptor
+        op = 0 # cadastro
+        receptor = 2 # can2
+        print("Comando Acionamento")
+        payload = bytearray()
+        payload += b'\x00\x43'
+        payload.append(op) # operacao CRUD 0=Cad
+        payload.append(60) # x30 = device(bHigh)=3 e disp_dev(bLow)=0 
+        payload.extend(libevents.wiegand_to_hex(serial))
+        payload += b'\x00\x00' # byte 5+6 contadorHL
+        payload += b'\x00\x00' # byte 7+8 UnidadeHL
+        payload += b'\x00'     # byte 9 bloco
+        payload += b'\x01'     # grupo 1 Horario
+        payload.append(receptor)
+        payload.extend(libevents.label_to_bcd(label, max_char=18))
+        payload += b'\x10'     #flags'
+        payload += b'\x00\x00\x20\x20\x20\x20'
+

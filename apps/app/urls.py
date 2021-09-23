@@ -7,6 +7,8 @@ urlpatterns = [
     path('', views.index, name='home'),
     path('CreateResident', views.ResidentCreate.as_view(), name='CreateResident'),
     path('ListResident', views.ResidentList.as_view(), name='ListResident'),
+    path('ListEvent', views.EventList, name='ListEvent'),
+
 
     # Matches any html file
 

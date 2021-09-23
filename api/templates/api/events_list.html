@@ -1,0 +1,45 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Eventos {% endblock %} 
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+
+<table class="table">
+	<thead>
+	  <tr>
+		<th scope="col">data</th>
+		<th scope="col">Usuario</th>
+		<th scope="col">Serial</th>
+		<th scope="col">Entrada</th>
+		<th scope="col">Acesso</th>
+		<th scope="col"><a href="">deletar Tudo</a></td></th>
+	  </tr>
+	</thead>
+  
+	<tbody>
+	  {% for object in object_list %}
+		  <tr>
+			  <th scope="row">{{ object.data }}</th>
+			  <td><a href="">{{ object.resident}}</a></td>
+			  <td>{{ object.serial }}</td>
+			  <td>{{ object.receptor }}</td>
+			  <td>{{ object.access }}</td>
+			  <td> <a href="">deletar</a></td>
+  
+		  </tr>
+	 {% empty %}
+	 <li>No objects yet.</li>
+	  {% endfor %}
+	</tbody>
+  </table>
+	  <a class="btn btn-outline-dark btn-block" href="" role="button">Deletar Todos os Eventos</a>
+
+    
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}{% endblock javascripts %}

@@ -4,6 +4,9 @@ import controlers.control2conf as conf
 
 class FrameEvt():
 	def __init__(self, frame, controler):
+		self.frame = frame
+		self.resposta = ''
+		self.access = ''
 		if (controler == "MG3000"):
 			self.evttype 		= frame[0] & 0xF1 >> 4
 			self.serial 		= '0000' + convert.fmtByte_to_Str(frame[1:3 + 1], separador='')

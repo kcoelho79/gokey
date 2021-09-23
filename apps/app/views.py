@@ -8,6 +8,7 @@ from django.shortcuts import render
 from django.views.generic.edit import CreateView
 from django.views.generic.list import ListView
 from .models import Resident
+from api.models import Events
 
 #@login_required(login_url="/login/")
 def index(request):
@@ -23,6 +24,11 @@ class ResidentCreate(CreateView):
 
 class ResidentList(ListView):
     model = Resident
+
+def EventList(request):
+    eventos = Events.objects.all()
+    return render(request, 'api/events_list.html' , {'object_list':eventos})
+
 
 #@login_required(login_url="/login/")
 def pages(request):

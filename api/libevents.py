@@ -8,6 +8,19 @@ def validade_header(frame):
 def get_serial(frame):
     return convert.fmtByte_to_Str(frame, separador='')
 
+def wiegand_to_hex(serial):
+    s1, s2 = serial.split('-')          # separa o prefixo 2 algarismo e o  sufixo 4 algarismo do serial
+    s1 = int(s1).to_bytes(1, 'big')     #converte inteiro para byte
+    s2 = int(s2).to_bytes(2, 'big')
+    return s1 + s2
+
+def label_to_bcd(label, max_char):
+    label = str.encode(label) # converte str para bytes
+    for i in range(max_char - len(label)):
+        label += b'\x00'
+    print("LABEL", label)
+    return label
+
 def get_date(frame, bcd=True):
     if (bcd):
         hora =  convert.bcd2int(frame[0])
