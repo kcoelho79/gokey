@@ -95,7 +95,6 @@ class MG3000():
                 event.access = 'Nao Autorizado'
         self.__print_event(event)
 
-    
 # PC COMANDOS EXECUTANDO
 
     def acionamento(self, event):
@@ -133,6 +132,6 @@ class MG3000():
         payload += b'\x01'     # grupo 1 Horario
         payload.append(receptor)
         payload.extend(libevents.label_to_bcd(label, max_char=18))
-        payload += b'\x10'     #flags'
-        payload += b'\x00\x00\x20\x20\x20\x20'
+        payload += b'\x40'     #flags'
+        payload += b'\x00\x00\x20\x20\x20\x20\x20\x20\x20'
 
