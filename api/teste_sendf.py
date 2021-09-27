@@ -11,6 +11,24 @@ def teste_ler_dispositivo():
 	print("ReSPOSTA HEX: ",resposta)
 	print("ReSPOSTA BCD: ",convert.fmtByte_to_Str(resposta,'/'))
 
+def teste_importar_cadastro():
+	print("importar cadastro")
+	payload = bytearray()
+	payload += b'\x00\x46'
+	resposta = enviarframe(payload)
+	i = 0
+	while resposta[2] != 240:
+		i += 1
+		print(resposta)
+		resposta = sendframe(b'\x00')
+	print("total importado ",i)
+
+def teste_total_dispositivo():
+	print("total de dispositivos na memoria")
+	payload = bytearray()
+	payload += b'\x00\x07'
+	resposta = enviarframe(payload)
+	print(str(resposta[2]) + str(resposta[3]))
 
 #libera passagem
 def teste_cadastrar_cartao():
@@ -41,6 +59,13 @@ def teste_cadastrar_cartao():
 TCP_IP = '10.238.0.41'
 TCP_PORT = 9000
 
+def build_frame_to_send_not_checksum(payload):
+    cabecalho = b'STX'
+    rodape = b'ETX'
+    tamanho = int.to_bytes(len(payload) + 1, 2, 'big')
+    checksum = convert.calcula_checksum(payload).to_bytes(1, 'big')
+    frame =  cabecalho + tamanho + payload + checksum 
+    return frame
 
 def build_frame_to_send(payload):
     cabecalho = b'STX'
@@ -55,6 +80,16 @@ def build_frame_to_send_sem_cabecalho(payload):
     frame =  payload + checksum 
     return frame
 
+def sendframe(payload):
+	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+	s.connect((TCP_IP, TCP_PORT))
+	print("ENVIANDO HEX  :", payload)
+	print(convert.fmtByte_to_Str(payload,' '))
+	s.sendall(payload)
+	resposta = s.recv(4096)
+	s.close()
+	return resposta
+
 def enviarframe(payload):
 	frame = build_frame_to_send_sem_cabecalho(payload)
 	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -67,5 +102,7 @@ def enviarframe(payload):
 	return resposta
 
 
-teste_cadastrar_cartao()
+#teste_cadastrar_cartao()
 #teste_ler_dispositivo()
+teste_importar_cadastro()
+teste_total_dispositivo()

@@ -114,13 +114,13 @@ class MG3000():
         payload.append(cs) 
         return(payload)
 
-    def crud_device(self, op, serial, receptor):
+    def crud_device(self, op, nome, serial, receptor):
         #comando 67 0x00+0x43
         #comando/opcao/frame_dev/cs
         #opcao,serial,label,receptor
         op = 0 # cadastro
         receptor = 2 # can2
-        print("Comando Acionamento")
+        print("Comando Cadastramento")
         payload = bytearray()
         payload += b'\x00\x43'
         payload.append(op) # operacao CRUD 0=Cad
@@ -131,7 +131,7 @@ class MG3000():
         payload += b'\x00'     # byte 9 bloco
         payload += b'\x01'     # grupo 1 Horario
         payload.append(receptor)
-        payload.extend(libevents.label_to_bcd(label, max_char=18))
+        payload.extend(libevents.label_to_bcd(nome, max_char=18))
         payload += b'\x40'     #flags'
         payload += b'\x00\x00\x20\x20\x20\x20\x20\x20\x20'
 
