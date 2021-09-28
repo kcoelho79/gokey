@@ -27,7 +27,7 @@ def teste_total_dispositivo():
 	print("total de dispositivos na memoria")
 	payload = bytearray()
 	payload += b'\x00\x07'
-	resposta = enviarframe(payload)
+	enviarframe(payload)
 	print(str(resposta[2]) + str(resposta[3]))
 
 #libera passagem
@@ -51,6 +51,24 @@ def teste_cadastrar_cartao():
 	payload += b'\x10'     #flags'
 	payload += b'\x00\x00\x20\x20\x20\x20\x20\x20\x20'
 	print("RESP0STA: ",convert.fmtByte_to_Str(enviarframe(payload)," "))
+
+def abrir_todas_as_portas():
+	print("Abrindo todas as portas")
+	print(abrir_portas(porta=1))
+	print(abrir_portas(porta=4))
+
+
+def abrir_portas(porta):
+	print("Abrindo a porta ",porta)
+	endereco = 1
+	payload = bytearray()
+	payload += b'\x00\x0d'
+	payload.append(3)
+	payload.append(endereco)
+	payload.append(porta)
+	payload.append(0)
+	payload += convert.calcula_checksum(payload).to_bytes(1, 'big')
+	sendframe_sem_resposta(payload)
 
 # nao liberado
 #data = b'STX\x00\x15\x00t\x00(\x11\x00\x03\x00\x00F\x89\n\x15\x11\x0f\x04\x01\x00\x00R\x15ETX'
@@ -80,12 +98,22 @@ def build_frame_to_send_sem_cabecalho(payload):
     frame =  payload + checksum 
     return frame
 
+def sendframe_sem_resposta(payload):
+	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+	s.connect((TCP_IP, TCP_PORT))
+	print("ENVIANDO HEX  :", payload)
+	print(convert.fmtByte_to_Str(payload,' '))
+	s.sendall(payload)
+	s.close()
+
+
 def sendframe(payload):
 	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 	s.connect((TCP_IP, TCP_PORT))
 	print("ENVIANDO HEX  :", payload)
 	print(convert.fmtByte_to_Str(payload,' '))
 	s.sendall(payload)
+	s.settimeout(2.0)
 	resposta = s.recv(4096)
 	s.close()
 	return resposta
@@ -101,8 +129,8 @@ def enviarframe(payload):
 	s.close()
 	return resposta
 
-
 #teste_cadastrar_cartao()
 #teste_ler_dispositivo()
-teste_importar_cadastro()
-teste_total_dispositivo()
+#teste_importar_cadastro()
+#teste_total_dispositivo()
+abrir_todas_as_portas()
