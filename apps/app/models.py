@@ -9,7 +9,7 @@ class Resident(models.Model):
 	serial = models.CharField(max_length=9)
 
 	def get_absolute_url(self):
-		return '/'
+		return '/ListResident'
 
 	def __str__(self):
 		return self.serial

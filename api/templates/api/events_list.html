@@ -16,7 +16,7 @@
 		<th scope="col">Serial</th>
 		<th scope="col">Entrada</th>
 		<th scope="col">Acesso</th>
-		<th scope="col"><a href="">deletar Tudo</a></td></th>
+		<th scope="col"><a href="{% url 'EventDeleteAll' %}">Apagar Tudo</a></td></th>
 	  </tr>
 	</thead>
   
@@ -28,7 +28,7 @@
 			  <td>{{ object.serial }}</td>
 			  <td>{{ object.receptor }}</td>
 			  <td>{{ object.access }}</td>
-			  <td> <a href="">deletar</a></td>
+			  <td> <a href="{%url 'EventDelete' object.id%}">Apagar</a></td>
   
 		  </tr>
 	 {% empty %}

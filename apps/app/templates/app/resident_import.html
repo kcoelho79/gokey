@@ -1,0 +1,19 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Cadastrar Resident {% endblock %} 
+
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+  <h3>Importar Residentes</h3><br>
+
+      <form action="{% url 'ResidentImport'%}" method="post">{% csrf_token %}
+        <label for="fhost">Host</label><br>
+        <input type="text" name="host" maxlength="15" id="id_host" autofocus=""><br><br>
+        <button type="submit" id="btn_importar" class="btn btn-dark">Importar</button>  
+      </form>
+      
+{% endblock content %} 
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %} {% endblock javascripts %}

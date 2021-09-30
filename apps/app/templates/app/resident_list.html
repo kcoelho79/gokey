@@ -6,18 +6,27 @@
 {% block stylesheets %}{% endblock stylesheets %}
 
 {% block content %}
-<ul>
-	{% for object in object_list %}
-	<li>{{ object.name }}</li>
-	<li>{{ object.serial }}</li>
-
-	<hr/>
-	<!-- If object_list is empty -->
-	{% empty %}
-	<li>No objects yet.</li>
-	{% endfor %}
-</ul>
-
+<table class="table">
+	<thead>
+		<tr>
+		<th scope="col">id</th>	
+		<th scope="col">Nome</th>
+		<th scope="col">Serial</th>
+		<th scope="col"><a href="">Deletar Tudo</a> </th>
+	  </tr>
+	</thead>
+	<tbody>
+	  {% for object in object_list %}
+		  <tr>
+			  <th scope="row">{{ object.id }}</th>
+			  <td>{{ object.name }}</td>
+			  <td>{{ object.serial }}</td>
+			  <td> <a href="{% url 'ResidentDelete' object.id %}">deletar</a></td>
+		  </tr>
+	  {% endfor %}
+	</tbody>
+  </table>
+	  <a class="btn btn-outline-dark btn-block" href="" role="button">Deletar Todos os Cartoes</a>
     
 {% endblock content %}
 

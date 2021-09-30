@@ -85,8 +85,8 @@ class MG3000():
     def __process_event(self, frameevento):
         event = FrameEvt(frameevento, self.controler)
         if (event.evttype == 0): 
-           # if (librule.isresident(event.serial)):
-            if (event.serial in bd.AUTORIZADOS):
+            if (librule.isresident(event.serial)):
+            #if (event.serial in bd.AUTORIZADOS):
                 event.resposta = self.conn.send(self.acionamento(event))
                 print("RESPOSTA ->", event.resposta)
                 event.access = 'Autorizado'

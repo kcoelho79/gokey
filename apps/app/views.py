@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import loader
 from django.urls import reverse
-from django.shortcuts import render 
+from django.shortcuts import render, redirect
 from django.views.generic.edit import CreateView
 from django.views.generic.list import ListView
 from .models import Resident
@@ -29,6 +29,32 @@ def EventList(request):
     eventos = Events.objects.all()
     return render(request, 'api/events_list.html' , {'object_list':eventos})
 
+def EventDelete(request, id):
+    event = Events.objects.get(id=id)
+    event.delete()
+    return redirect('EventList')
+
+def EventDeleteAll(request):
+    event = Events.objects.all()
+    event.delete()
+    return redirect('EventList')
+
+def ResidentImport(request):
+    if request.method == 'POST':
+        host = request.POST.get('host', None)
+        print("HOST:",host)
+        #conectar
+        #importar
+        #comparar lista
+        #adicionar
+        return redirect('ListResident')
+    else:
+        return render(request, 'app/resident_import.html')
+
+def ResidentDelete(request, id):
+    resident = Resident.objects.get(id=id)
+    resident.delete()
+    return redirect('ListResident')
 
 #@login_required(login_url="/login/")
 def pages(request):
