@@ -10,6 +10,7 @@ from api.models import Events
 class MG3000():
     def __init__(self, frame, conn):
 
+
         commands = {
             4 : self.__pc_event4,
             33: self.__pc_event33,
@@ -135,3 +136,24 @@ class MG3000():
         payload += b'\x40'     #flags'
         payload += b'\x00\x00\x20\x20\x20\x20\x20\x20\x20'
 
+def sendframe()
+    pass
+
+def import_device(host):
+    print("importar cadastro")
+	payload = bytearray()
+	payload += b'\x00\x46'
+    checksum = convert.calcula_checksum(payload).to_bytes(1, 'big')
+    frame =  payload + checksum
+	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+	s.connect((TCP_IP, TCP_PORT))
+	s.sendall(frame)
+	resposta = s.recv(4096)
+	while resposta[2] != 240:
+		i += 1
+		print(resposta)
+		resposta = sendframe(b'\x00')
+    s.close()
+	return resposta
+	i = 0
+	print("total importado ",i)
